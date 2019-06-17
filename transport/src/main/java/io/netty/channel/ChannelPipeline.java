@@ -34,6 +34,7 @@ import java.util.NoSuchElementException;
  * <a href="http://www.oracle.com/technetwork/java/interceptingfilter-142169.html">Intercepting Filter</a> pattern
  * to give a user full control over how an event is handled and how the {@link ChannelHandler}s in a pipeline
  * interact with each other.
+ * 可以控制Channel
  *
  * <h3>Creation of a pipeline</h3>
  *

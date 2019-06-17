@@ -132,12 +132,14 @@ public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
         }
         return heapBuffer(DEFAULT_INITIAL_CAPACITY);
     }
-
+    //判断是直接缓存还是间接缓存
     @Override
     public ByteBuf ioBuffer(int initialCapacity) {
         if (PlatformDependent.hasUnsafe() || isDirectBufferPooled()) {
+            //直接缓存 也就是操作系统层面的
             return directBuffer(initialCapacity);
         }
+        //堆内缓存  直接返回一个字节数组
         return heapBuffer(initialCapacity);
     }
 

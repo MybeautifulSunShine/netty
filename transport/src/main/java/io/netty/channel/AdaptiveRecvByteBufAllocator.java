@@ -24,8 +24,9 @@ import static java.lang.Math.min;
 
 /**
  * The {@link RecvByteBufAllocator} that automatically increases and
- * decreases the predicted buffer size on feed back.
+ * decreases the predicted buffer size on feed back. 根据反馈自动的增加buffer的大小
  * <p>
+ *    基于前一次读的数量与读取到buffer的大小 根据结果 自动的增加缓存区的大小
  * It gradually increases the expected number of readable bytes if the previous
  * read fully filled the allocated buffer.  It gradually decreases the expected
  * number of readable bytes if the read operation was not able to fill a certain
@@ -42,17 +43,21 @@ public class AdaptiveRecvByteBufAllocator extends DefaultMaxMessagesRecvByteBufA
     private static final int INDEX_DECREMENT = 1;
 
     private static final int[] SIZE_TABLE;
-
+   //在构造方法执行之前就执行的
     static {
         List<Integer> sizeTable = new ArrayList<Integer>();
+        //16进制规律
         for (int i = 16; i < 512; i += 16) {
             sizeTable.add(i);
         }
-
+        //i向左位移1位,也就是乘以 2 一旦溢出 就跳出循环
         for (int i = 512; i > 0; i <<= 1) {
             sizeTable.add(i);
         }
-
+        //sizeTable 是做什么事情?
+       //创建同样大小的SIZE_TABLE 从小到大的顺序 设定可分配缓存区大小
+       //也就是说根据前一次的缓存区大小分配 SIZE_TABLE 的大小去判断下一个大小并且 是
+       //怎么去申请缓存区呢?
         SIZE_TABLE = new int[sizeTable.size()];
         for (int i = 0; i < SIZE_TABLE.length; i ++) {
             SIZE_TABLE[i] = sizeTable.get(i);
@@ -147,12 +152,13 @@ public class AdaptiveRecvByteBufAllocator extends DefaultMaxMessagesRecvByteBufA
     private final int maxIndex;
     private final int initial;
 
-    /**
+    /**缓存区的大小初始值是1024 不会比64小 不会超过 65536
      * Creates a new predictor with the default parameters.  With the default
      * parameters, the expected buffer size starts from {@code 1024}, does not
      * go down below {@code 64}, and does not go up above {@code 65536}.
      */
     public AdaptiveRecvByteBufAllocator() {
+        //默认的构造参数   那么怎么自动变化大小的呢?
         this(DEFAULT_MINIMUM, DEFAULT_INITIAL, DEFAULT_MAXIMUM);
     }
 

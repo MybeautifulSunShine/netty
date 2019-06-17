@@ -254,6 +254,7 @@ public final class PlatformDependent {
      * Return {@code true} if {@code sun.misc.Unsafe} was found on the classpath and can be used for accelerated
      * direct memory access.
      */
+    //判断是否包含 sun.misc.Unsafe这个路径
     public static boolean hasUnsafe() {
         return UNSAFE_UNAVAILABILITY_CAUSE == null;
     }

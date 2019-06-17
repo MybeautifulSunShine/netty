@@ -30,49 +30,64 @@ import java.net.SocketAddress;
 /**
  * A nexus to a network socket or a component which is capable of I/O
  * operations such as read, write, connect, and bind.
+ * (channel  可以认为是一个连接点 , 网络套接制的一个组件,channel对于网络Socket的一个连接组件, 是可以进行IO操作的,读,写,绑定)
  * <p>
  * A channel provides a user:
  * <ul>
  * <li>the current state of the channel (e.g. is it open? is it connected?),</li>
+ * (获取到当前的状态,比如说 是不是打开,是否链接上)
  * <li>the {@linkplain ChannelConfig configuration parameters} of the channel (e.g. receive buffer size),</li>
+ * (通过以一些配置参数来实现的,提供了一些配置参数,比如说Buffer的大小)
  * <li>the I/O operations that the channel supports (e.g. read, write, connect, and bind), and</li>
+ * (提供对当前连接的IO操作,比如说,读,写, 连接,绑定)
  * <li>the {@link ChannelPipeline} which handles all I/O events and requests
  *     associated with the channel.</li>
+ *(Channel可以向用户提供ChannelPipeline(channel的管道),是可以处理与当前channel事件所关联的操作与请求所有IO操作 与请求)
+ * 也就是说我们这个Channel连接上之后,所有的Channel连接的请求,都可以通过这个ChannelPipeline组件获取到  ChannelPipeline 是将所有的Event_handle() 来有机的组合起来,使得组合之后生成一个链条
+ *
+ * 问题 ChannelPipeline是在什么时期创建的呢?
  * </ul>
  *
  * <h3>All I/O operations are asynchronous.</h3>
- * <p>
+ * <p>所有的IO操作都是异步的
  * All I/O operations in Netty are asynchronous.  It means any I/O calls will
  * return immediately with no guarantee that the requested I/O operation has
- * been completed at the end of the call.  Instead, you will be returned with
+ * been completed at the end of the call.
+ * 这意味着任何I / O调用将立即返回，并且不保证在调用结束时已完成所请求的I / O操作。
+ * Instead, you will be returned with
  * a {@link ChannelFuture} instance which will notify you when the requested I/O
  * operation has succeeded, failed, or canceled.
- *
- * <h3>Channels are hierarchical</h3>
+ * 将返回一个ChannelFuture 来告诉你是否成功了,失败了,或者其他
+ * <h3>Channels are hierarchical(可继承的)</h3>
  * <p>
  * A {@link Channel} can have a {@linkplain #parent() parent} depending on
  * how it was created.  For instance, a {@link SocketChannel}, that was accepted
  * by {@link ServerSocketChannel}, will return the {@link ServerSocketChannel}
  * as its parent on {@link #parent()}.
  * <p>
+ * 一个Channel可以拥有一个parent(),这取决于这个Channel的创建方式,比如说:一个SocketChannel是由ServerSocketChannel()创建的
+ *
  * The semantics of the hierarchical structure depends on the transport
- * implementation where the {@link Channel} belongs to.  For example, you could
+ * implementation where the {@link Channel} belongs to.
+ * 层次化的语意取决于Channel的实现,
+ * For example, you could
  * write a new {@link Channel} implementation that creates the sub-channels that
  * share one socket connection, as <a href="http://beepcore.org/">BEEP</a> and
  * <a href="http://en.wikipedia.org/wiki/Secure_Shell">SSH</a> do.
- *
+ *大概意思就是说你可以编写一个新的Channel并且实现其接口,这个字Channel就可以共享它的连接,与数据等数据 如同SHH 协议一样
  * <h3>Downcast to access transport-specific operations</h3>
  * <p>
  * Some transports exposes additional operations that is specific to the
  * transport.  Down-cast the {@link Channel} to sub-type to invoke such
  * operations.  For example, with the old I/O datagram transport, multicast
  * join / leave operations are provided by {@link DatagramChannel}.
- *
+ *同样的因为层次化的结构,也可以进行向下转化,可以访问实现类的一些方法
  * <h3>Release resources</h3>
  * <p>
  * It is important to call {@link #close()} or {@link #close(ChannelPromise)} to release all
  * resources once you are done with the {@link Channel}. This ensures all resources are
  * released in a proper way, i.e. filehandles.
+ 1 是一个连接点2所有的请求都是异步的
  */
 public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparable<Channel> {
 
@@ -83,6 +98,7 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
 
     /**
      * Return the {@link EventLoop} this {@link Channel} was registered to.
+     事件,返回Channel注册到其上的Event事件
      */
     EventLoop eventLoop();
 
